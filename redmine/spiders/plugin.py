@@ -4,6 +4,7 @@ import sys
 #reload(sys)
 #sys.setdefaultencoding('utf8')
 import scrapy
+import codecs
 from redmine.items import Plugin
 
 class PluginSpider(scrapy.Spider):
@@ -11,7 +12,7 @@ class PluginSpider(scrapy.Spider):
     start_urls = ['http://www.redmine.org/plugins?page=1/']
     home_url = 'http://www.redmine.org'
     plugins = []
-    f = open('plugins.txt', 'w')
+    f = codecs.open('plugins.txt','w','utf-8')
 
     def parse_plugin(self, response):
         p = Plugin()
@@ -69,7 +70,7 @@ class PluginSpider(scrapy.Spider):
             except:
                 print('\nno rating count')
         try:
-            p.wiki = '.'.join([st.replace('\n','.') for st in response.css('div.wiki::text').extract() if len(st.strip()) > 0])
+            p.wiki = '.'.join([st.replace('\n','.') for st in response.xpath("//div[@class='wiki']//text()").extract() if len(st.strip()) > 0])
             if not p.wiki:
                 p.wiki = '-'
         except:
