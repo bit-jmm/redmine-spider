@@ -5,6 +5,7 @@ import sys
 #sys.setdefaultencoding('utf8')
 import scrapy
 import codecs
+import traceback
 from redmine.items import Plugin
 
 class PluginSpider(scrapy.Spider):
@@ -25,31 +26,30 @@ class PluginSpider(scrapy.Spider):
         except:
             print('\nno image:')
         p.url = response.url
-        try:
-            p.author = response.css('a.user::text').extract_first().strip()
-        except:
-            print('\nauthor error:')
         j = 0
         try:
-            p.website = response.css('td > a::text')[1].extract().strip()
+            p.author = response.xpath("//table//tr[1]/td[2]/a/text()").extract_first().strip()
         except:
-            j += 1
+            #traceback.print_exc()
+            print('\nno author:')
+        try:
+            p.website = response.xpath('//table//tr[2]/td[1]/a/text()').extract_first().strip()
+        except:
             print('\nno website:')
         try:
-            p.repo = response.css('td > a::text')[2-j].extract().strip()
+            p.repo = response.xpath('//table//tr[3]/td[1]/a/text()').extract_first().strip()
         except:
-            j += 1
             print('\nno repo site:')
         try:
-            p.register_date = response.css('tr > td::text')[j+2].extract().strip()
+            p.register_date = response.xpath('//table//tr[4]/td[1]/text()').extract_first().strip()
         except:
             print('\nregister date error:')
         try:
-            p.cur_version = response.css('tr > td::text')[j+3].extract().strip()
+            p.cur_version = response.xpath('//table//tr[5]/td[1]/text()').extract_first().strip()
         except:
             print('\ncurrent version error:')
         try:
-            p.compatiable_version = response.css('tr > td::text')[j+4].extract().strip()
+            p.compatiable_version = response.xpath('//table//tr[6]/td[1]/text()').extract_first().strip()
         except:
             print('\ncompatiable version error:')
         try:
